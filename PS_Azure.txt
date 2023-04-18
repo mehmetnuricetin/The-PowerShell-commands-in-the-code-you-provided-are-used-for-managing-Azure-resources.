@@ -1,0 +1,49 @@
+﻿    # Install Azure Module AZ
+install-module az -Force -AllowClobber
+
+    # Connect to Azure account
+Connect-AzAccount
+
+    # To see the environment you are logged into
+Get-AzContext |Format-list
+
+    # To select the right Subscription
+Select-AzSubscription -Subscription "Pay-As-You-Go"
+
+    # Check RG in the Subscription
+Get-AzResourceGroup
+
+    # Check RG in the Subscription in nice format
+Get-AzResourceGroup | Format-Table
+
+    # Check RG in the Subscription with GUI
+Get-AzResourceGroup | Out-GridView
+
+# Check RG in the Subscription
+Get-AzResourceGroup | Out-GridView -PassThru
+
+    # Check RG in the Subscription with selection
+Get-AzResourceGroup | select ResourceGroupName, Location
+
+    # Combine more cmdlet for RG's (using Expression-function)
+Get-AzResourceGroup | Where-Object {$_.Location -eq "westeurope"} | select ResourceGroupName, Location
+
+    # Create a new RG for use for example VM in North Europe
+New-AzResourceGroup -Name school2 -Location 'North Europe'
+
+
+    # Create a new VM in the RG
+New-AzVM -ResourceGroupName school2 -Location 'North Europe' -Name vmtest1 -Image UbuntuLTS
+
+    # Create a Storageaccount in RG School2 with a variable (and search Get-AzLocation)
+$RG = "School2"
+$location = "North Europe"
+New-AzResourceGroup -Name $RG -Location $location
+New-AzStorageAccount -ResourceGroupName $RG `
+  -Name stoaccschool2 `
+  -Location $location `
+  -SkuName Standard_RAGRS `
+  -Kind StorageV2
+
+    # Delete Storage Account
+Remove-AzStorageAccount -Name stoaccschool2 -ResourceGroupName $RG
